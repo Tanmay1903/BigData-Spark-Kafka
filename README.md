@@ -57,5 +57,27 @@
   - ```spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.2 {PATH_TO_YOUR_FILE}```
   - Example in my case:
     ```spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.2 Desktop/BigData_Assn3/consumer_with_clustering.py```
- 
+    
+## How to Install Spark on Windows 
+- Check Prerequisites.
+  - Check for Java Installation
+  - check for Python Installation 
+- Install Apache Spark from "https://spark.apache.org/downloads.html"
+- Extract Spark in C:\ folder
+- Set Environment Variables: 
+  User Variable
+  - HADOOP_HOME : C:\hadoop
+  - SPARK_HOME: C:\spark\spark-3.4.0-bin-hadoop3
+  - JAVA_HOME: C:\java\jdk1.8.0_202
+  - PYSPARK_PYTHON: C:\Users\"XYZ"\AppData\Local\Programs\Python\Python311\python.exe
+  System Variable 
+  - %HADOOP_HOME%\bin
+  - %SPARK_HOME%\bin
+  - %JAVA_HOME%\bin
+  - C:\Users\"XYZ"\AppData\Local\Programs\Python\Python311\Lib\site-packages
+ - For Spark to run on windows we need winutils 
+  - Download the winutils.exe from https://github.com/steveloughran/winutils 
+    based on your spark version
+  - extract that into c:\hadoop\bin
+ - run "spark-shell" on command Prompt
   
