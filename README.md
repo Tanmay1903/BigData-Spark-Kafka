@@ -66,12 +66,12 @@
 - Install Pip Install Pyspark.
 - Extract Spark in C:\ folder
 - Set Environment Variables: 
-   ### User Variable
+   #### User Variable
   - HADOOP_HOME : C:\hadoop
   - SPARK_HOME: C:\spark\spark-3.4.0-bin-hadoop3
   - JAVA_HOME: C:\java\jdk1.8.0_202
   - PYSPARK_PYTHON: C:\Users\"XYZ"\AppData\Local\Programs\Python\Python311\python.exe
-   ### System Variable 
+   #### System Variable 
   - %HADOOP_HOME%\bin
   - %SPARK_HOME%\bin
   - %JAVA_HOME%\bin
