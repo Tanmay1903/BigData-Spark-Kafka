@@ -79,7 +79,7 @@ assembler = VectorAssembler(
     outputCol="features"
 )
 
-kmeans = KMeans(k=7, seed=1)
+kmeans = KMeans(k=4, seed=1)
 predictions = None
 
 # Read data from Kafka as a streaming DataFrame
