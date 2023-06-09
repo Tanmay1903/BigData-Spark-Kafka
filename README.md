@@ -42,6 +42,8 @@
 - producer.py: In this file, Kafka Producer is implemented as a seperate application.
 - consumer.py: In this file, Structured Streaming is implemented as a seperate application to consume data from Kafka topic.
 - consumer_with_clustering.py: In this file, Structured Streaming is implemented as a seperate application to consume data from Kafka topic and K-means clustering algorithm is implemented using Spark's MLlib library.
+- parquet_17GB - This folder contains the output of the analysis in parquet file format on 17GB file(100 Batches only).
+- parquet_42MB - This folder contains the output of the analysis in parquet file format on 42MB file.
  
 ## How to run the code
 - .ipynb files can be executed directly using Jupyter notebook.
