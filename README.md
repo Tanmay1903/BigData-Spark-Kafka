@@ -14,3 +14,33 @@
 
 - Bonus Problem: The bonus task requires the development of a clustering algorithm capable of grouping requests based on several factors, including the host that invoked it, the time at which the endpoint was accessed, the status code received, and the data size of the returned information.
 
+## System Configurations
+- Apple Macbook Pro
+  -	Processor: Apple M1 chip.
+  -	Cores: 10 number of cores.
+  -	Memory: 8 GB RAM available on the system.
+  -	Storage Type: SSd storage with 256 GB storage space
+  -	Storage size available: Available disk space.
+  -	Operating System: macOS Ventura
+  -	Programming Language: Python3
+- Samsung Galaxy Notebook 7
+  - Processor: Intel i7 11th Gen.
+  - Cores: 10 number of cores.
+  - Memory: 16 GB RAM available on the system.
+  - Storage Type: SSd storage with 512 GB storage space
+  - Storage size available: Available disk space.
+  - Operating System: Windows 11
+  - Programming Language: Python3
+
+## Files in the Project
+- Big_data_Assn_3_RDD.ipynb: This file contains the script that determines K Most Frequent Words using Spark RDD.
+- Big_data_Assn_3_DataFrame.ipynb: This file contains the script that determines K Most Frequent Words using Spark DataFrame.
+- LogAnalytics-Article.ipynb: This file contains the log analysis as per the article mentioned in the assignment.
+- LogAnalytics-SectionA.ipynb: This file contains the log analysis on the NASA dataset to get the desired results.
+- BigDataAssn3-Kafka.py: This file contains the implemented code for running Producer and Consumer Sequentially.
+- BigDataAssn3-Kafka-thread.py: This file contains the implemented code for running Producer and Consumer Parallely in Threads.
+- producer.py: In this file, Kafka Producer is implemented as a seperate application.
+- consumer.py: In this file, Structured Streaming is implemented as a seperate application to consume data from Kafka topic.
+- consumer_with_clustering.py: In this file, Structured Streaming is implemented as a seperate application to consume data from Kafka topic and K-means clustering algorithm is implemented using Spark's MLlib library.
+ 
+  
