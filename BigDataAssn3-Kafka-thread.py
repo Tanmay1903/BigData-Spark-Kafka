@@ -31,12 +31,14 @@ bootstrap_servers = 'localhost:9092'
 topic = 'log_topic_17_1'
 group_id = 'consumer_group'
 
+# Regular expression patterns for log parsing
 host_pattern = r'(^\S+\.[\S+\.]+\S+)\s'
 ts_pattern = r'\[(\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2} \+\d{4})\]'
 method_uri_protocol_pattern = r'\"(\S+)\s(\S+)\s*(\S*)\"'
 status_pattern = r'\s(\d{3})\s'
 content_size_pattern = r'\s(\d+)$'
 
+# Month and day mapping for log parsing
 month_map = {
   'Jan': 1, 'Feb': 2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6, 'Jul':7,
   'Aug':8,  'Sep': 9, 'Oct':10, 'Nov': 11, 'Dec': 12
@@ -86,8 +88,6 @@ def producer_job():
     producer.send(topic, value="end_of_file".encode('utf-8'))
     producer.close()
 
-
-#while True:
 # Create Kafka consumer DataFrame
 def consumer_job():
     df = spark \
@@ -134,8 +134,6 @@ def consumer_job():
                             .sort("count", ascending=False)
                             .select(enpoint_day_of_week_df.dayOfWeek.alias("Day in a Week"), enpoint_day_of_week_df.endpoint, "count"))
             highest_invocations_df.show(1, truncate=False)
-            # Write DataFrame to Parquet format in HDFS
-            # highest_invocations_df.write.parquet("/Users/tanmaysingla/Desktop/BigData_Assn3/parquet_17GB/highest_invocations")
             
             not_found_df = logs_df_with_time.filter(logs_df["status"] == 404)
             yearly_404_sorted_df = (not_found_df
@@ -144,8 +142,15 @@ def consumer_job():
                             .count()
                             .sort("count", ascending=True).limit(10))
             yearly_404_sorted_df.show(10, truncate=False)
-            # yearly_404_sorted_df.write.parquet("/Users/tanmaysingla/Desktop/BigData_Assn3/parquet_17GB/yearly_404")
-            # Here, we are simply printing the contents of the DataFrame for demonstration purposes
+
+            # Write DataFrame to Parquet format in Local
+            # highest_invocations_df.write.parquet("/Users/tanmaysingla/Desktop/BigData_Assn3/parquet_17GB/highest_invocations/" + str(batch_identifier))
+            # yearly_404_sorted_df.write.parquet("/Users/tanmaysingla/Desktop/BigData_Assn3/parquet_17GB/yearly_404/" + str(batch_identifier))
+
+            # Write DataFrame to Parquet format in HDFS
+            highest_invocations_df.write.parquet("hdfs://localhost:9000/data/parquet_17GB/highest_invocations/" + str(batch_identifier))
+            yearly_404_sorted_df.write.parquet("hdfs://localhost:9000/data/parquet_17GB/yearly_404/" + str(batch_identifier))
+
             if should_not_continue:
                 end_time = time.time() - start_time
                 print("Time taken: ", end_time)
@@ -169,6 +174,3 @@ consumer_thread.start()
 # Wait for both threads to finish
 producer_thread.join()
 consumer_thread.join()
-    
-# Sleep for 10 seconds before checking for available data again
-#time.sleep(10)

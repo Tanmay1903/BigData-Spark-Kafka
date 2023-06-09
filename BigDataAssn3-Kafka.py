@@ -1,13 +1,11 @@
 from kafka import KafkaProducer
 from pyspark.sql import SparkSession
-import time
 import logging
 from pyspark.sql import functions as F
 from pyspark.sql.functions import udf
 from pyspark.sql.functions import regexp_extract
 from pyspark.conf import SparkConf
 
-start_time = time.time()
 # Set the log level for Spark
 spark_log_level = "WARN"
 
@@ -19,17 +17,18 @@ conf = SparkConf() \
     
 # Initialize Spark session
 spark = SparkSession.builder.config(conf = conf).getOrCreate()
-# spark.sparkContext.setLogLevel(spark_log_level)
+spark.sparkContext.setLogLevel(spark_log_level)
 
 # Set the log level for KafkaProducer
 kafka_log_level = "ERROR"
-# logging.getLogger("kafka").setLevel(kafka_log_level)
+logging.getLogger("kafka").setLevel(kafka_log_level)
 
 # Set Kafka broker(s) and topic
 bootstrap_servers = 'localhost:9092'
 topic = 'log_topic_17GB_2'
 group_id = 'consumer_group'
 
+# Regular expression patterns for log parsing
 host_pattern = r'(^\S+\.[\S+\.]+\S+)\s'
 ts_pattern = r'\[(\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2} \+\d{4})\]'
 method_uri_protocol_pattern = r'\"(\S+)\s(\S+)\s*(\S*)\"'
@@ -79,14 +78,12 @@ log_file_path = '/Users/tanmaysingla/Downloads/17GBBigServerLog.log' # '/Users/t
 f = open(log_file_path, 'r')
 count = 0
 for line in f:
-    print(line.strip())
     producer.send(topic, value=line.strip().encode('utf-8'))
     
 producer.send(topic, value="end_of_file".encode('utf-8'))
 producer.close()
 
 
-#while True:
 # Create Kafka consumer DataFrame
 df = spark \
     .readStream \
@@ -145,8 +142,6 @@ def process_dataframe(df, batch_identifier):
         # yearly_404_sorted_df.write.parquet("/Users/tanmaysingla/Desktop/BigData_Assn3/parquet_17GB/yearly_404")
         # Here, we are simply printing the contents of the DataFrame for demonstration purposes
         if should_not_continue:
-            end_time = time.time() - start_time
-            print("Time taken: ", end_time)
             query.stop()
         
 
@@ -156,5 +151,3 @@ query = df.writeStream.foreachBatch(process_dataframe).start()
 # Wait for the termination of the query or 10 seconds
 query.awaitTermination()
     
-# Sleep for 10 seconds before checking for available data again
-#time.sleep(10)

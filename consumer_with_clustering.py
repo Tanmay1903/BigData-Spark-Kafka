@@ -28,12 +28,14 @@ bootstrap_servers = 'localhost:9092'
 topic = 'log_topic_17_1'
 group_id = 'consumer_group'
 
+# Regular expression patterns for log parsing
 host_pattern = r'(^\S+\.[\S+\.]+\S+)\s'
 ts_pattern = r'\[(\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2} \+\d{4})\]'
 method_uri_protocol_pattern = r'\"(\S+)\s(\S+)\s*(\S*)\"'
 status_pattern = r'\s(\d{3})\s'
 content_size_pattern = r'\s(\d+)$'
 
+# Month and day mapping for log parsing
 month_map = {
   'Jan': 1, 'Feb': 2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6, 'Jul':7,
   'Aug':8,  'Sep': 9, 'Oct':10, 'Nov': 11, 'Dec': 12
@@ -80,6 +82,7 @@ assembler = VectorAssembler(
 kmeans = KMeans(k=7, seed=1)
 predictions = None
 
+# Read data from Kafka as a streaming DataFrame
 df = spark \
     .readStream \
     .format("kafka") \
@@ -89,7 +92,7 @@ df = spark \
     .option("startingOffsets", "earliest") \
     .load()
 
-# Process received DataFrame
+# Process received DataFrame in each batch
 def process_dataframe(df, batch_identifier):
     print(batch_identifier)
     global predictions
@@ -97,10 +100,12 @@ def process_dataframe(df, batch_identifier):
         should_not_continue = False
         # Process the DataFrame using Spark
         df = df.withColumn("value", df["value"].cast("string"))
+        # Remove the "end_of_file" message from the DataFrame
         if df.filter(df["value"] == "end_of_file").count() > 0:
             should_not_continue = True
             df = df.filter(~(df["value"] == "end_of_file"))
             
+        # Extract relevant fields from the log lines using regular expressions
         logs_df = df.select(regexp_extract('value', host_pattern, 1).alias('host'),
                         regexp_extract('value', ts_pattern, 1).alias('timestamp'),
                         regexp_extract('value', method_uri_protocol_pattern, 1).alias('method'),
@@ -109,8 +114,10 @@ def process_dataframe(df, batch_identifier):
                         regexp_extract('value', status_pattern, 1).cast('integer').alias('status'),
                         regexp_extract('value', content_size_pattern, 1).cast('integer').alias('content_size'))
         
+        # Define a user-defined function (UDF) to parse the timestamp into a timestamp data type
         udf_parse_time = udf(parse_clf_time)
-
+        
+        # Apply the UDF to convert the timestamp column into a timestamp data type and rename the column
         logs_df_with_time = (logs_df.select('*', udf_parse_time(logs_df['timestamp']).cast('timestamp').alias('time')).drop('timestamp'))
 
         if(batch_identifier == 0):
@@ -132,7 +139,10 @@ def process_dataframe(df, batch_identifier):
         # prediction_df = predictions.select("host", "status", "method", "prediction")
         # prediction_df.select("host", "status", "method", "prediction").filter(prediction_df["prediction"] == 0).show()
         
+        # Define a UDF to parse the day of the week from the timestamp
         udf_parse_day = udf(parse_day_of_week)
+        
+        # Apply the UDF to extract the endpoint and day of the week columns
         enpoint_day_of_week_df = logs_df_with_time.select(logs_df_with_time.endpoint, udf_parse_day(F.dayofweek('time')).alias("dayOfWeek"))
         
         highest_invocations_df = (enpoint_day_of_week_df
@@ -150,9 +160,14 @@ def process_dataframe(df, batch_identifier):
                         .sort("count", ascending=True).limit(10))
         yearly_404_sorted_df.show(10, truncate=False)
 
+        # Write DataFrame to Parquet format in Local
+        # highest_invocations_df.write.parquet("/Users/tanmaysingla/Desktop/BigData_Assn3/parquet_17GB/highest_invocations/" + str(batch_identifier))
+        # yearly_404_sorted_df.write.parquet("/Users/tanmaysingla/Desktop/BigData_Assn3/parquet_17GB/yearly_404/" + str(batch_identifier))
+
         # Write DataFrame to Parquet format in HDFS
-        highest_invocations_df.write.parquet("/Users/tanmaysingla/Desktop/BigData_Assn3/parquet_17GB/highest_invocations/" + str(batch_identifier))
-        yearly_404_sorted_df.write.parquet("/Users/tanmaysingla/Desktop/BigData_Assn3/parquet_17GB/yearly_404/" + str(batch_identifier))
+        highest_invocations_df.write.parquet("hdfs://localhost:9000/data/parquet_17GB/highest_invocations/" + str(batch_identifier))
+        yearly_404_sorted_df.write.parquet("hdfs://localhost:9000/data/parquet_17GB/yearly_404/" + str(batch_identifier))
+        
         # Here, we are simply printing the contents of the DataFrame for demonstration purposes
         if should_not_continue:
             query.stop()
