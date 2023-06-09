@@ -43,4 +43,17 @@
 - consumer.py: In this file, Structured Streaming is implemented as a seperate application to consume data from Kafka topic.
 - consumer_with_clustering.py: In this file, Structured Streaming is implemented as a seperate application to consume data from Kafka topic and K-means clustering algorithm is implemented using Spark's MLlib library.
  
+## How to run the code
+- .ipynb files can be executed directly using Jupyter notebook.
+- To run producer.py:- 
+  - ```python producer.py ```  
+- To run consumer.py:-
+  - ```spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.2 {PATH_TO_YOUR_FILE}```
+  - Example in my case:
+    ```spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.2 Desktop/BigData_Assn3/consumer.py```
+- To run consumer_with_clustering.py:-
+  - ```spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.2 {PATH_TO_YOUR_FILE}```
+  - Example in my case:
+    ```spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.2 Desktop/BigData_Assn3/consumer_with_clustering.py```
+ 
   
