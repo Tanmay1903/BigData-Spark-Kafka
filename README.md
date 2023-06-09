@@ -62,9 +62,9 @@
 - Check Prerequisites
   - Check for Java Installation
   - check for Python Installation 
-- Install Apache Spark from "https://spark.apache.org/downloads.html".
+- Install Apache Spark from ``` "https://spark.apache.org/downloads.html"```.
 - Install Pip Install Pyspark.
-- Extract Spark in C:\ folder
+- Extract Spark in ```C:\ folder```
 - Set Environment Variables: 
    #### User Variable
   - HADOOP_HOME :``` C:\hadoop```
